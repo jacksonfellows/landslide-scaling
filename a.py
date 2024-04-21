@@ -30,8 +30,8 @@ datasets = load_datasets()
 def area_plot():
     plt.xscale("log")
     plt.yscale("log")
-    plt.xlabel("Landslide Area [m^2]")
-    plt.ylabel("Probability Density")
+    plt.xlabel("Landslide Area [$m^2$]")
+    plt.ylabel("Probability Density [$m^{-2}$]")
     for i,(key,dataset) in enumerate(datasets.items()):
         A = np.log(dataset["A_m2"].to_numpy())
         A = A[np.logical_not(np.isnan(A) | np.isinf(A))]
@@ -41,7 +41,7 @@ def area_plot():
         probs = np.exp(kde.score_samples(x[:, None]))
         plt.plot(np.exp(x), probs/np.exp(x), label=f"{key} (n={len(dataset)})")
     plt.legend()
-    plt.show()
+    plt.savefig("prob_area.pdf")
 
 def area_vol_plot():
     A = gdf["A_m2"]
