@@ -2,13 +2,22 @@
 #+date: April 21 2024
 #+options: toc:nil
 #+bibliography: landslide_scaling.bib
-#+cite_export: natbib
+#+cite_export: csl elsevier_harvard.csl
 
 * Scientific Motivation
-Landslides are fundamental surface processes that play an important role in sediment transport and landscape evolution in terrestrial environments.
-With the advent of high-resolution imagery we have observed landslides on many other (non-Earth) bodies, including the Moon, Mars, Venus, Mercury, and various asteroids.
+Landslides are fundamental surface processes that play an important role in sediment transport and landscape evolution.
+One approach to understand the factors that govern them is to study the statistics of landslide catalogs, collections of mapped landslides in a particular region.
+This allows for examination of how, for example, landslide volume scales with area or landslide frequency varies with size.
+This method has been used extensively for landslides on Earth, both for specific time periods (such as landslides triggered by a specific earthquake or storm) and geographic regions.
+It has allowed scientists to characterize the different processes that are responsible for terrestrial landslides as well as predict the occurrence rates of hazardous events.
 
-The differences between these bodies gives us a way to study the impact of gravity, the atmosphere, subsurface fluids, and the geologic environment on landslide properties.
+With the advent of high-resolution imagery we have observed landslides on many non-Earth bodies, including the Moon, Mars, Venus, Mercury, and various asteroids.
+For some of these locations, researchers have used mapping techniques developed on Earth to create landslide catalogs.
+Examining the difference in landslide scaling relations across these bodies gives us a way to study the impact of gravity, the atmosphere, subsurface fluids, and the geologic environment on landslide properties.
+* Previous Work
+[cite:@brunetti_large_2015] compiled small catalogs of landslides on crater slopes of the Moon and Mercury and compared their results to local terrestrial catalogs from Italy and New Mexico.
+[cite:@crosta_introducing_2018] created a comprehensive landslide catalog for Mars and compared landslides within different geological settings.
+They also hypothesized about different terrestrial analogs for these features.
 * Existing Landslide Catalogs
 ** Mercury
 Researchers have mapped landslides on crater slopes on Mercury [cite:@brunetti_large_2015].
@@ -23,22 +32,30 @@ The Washington State Geologic Survey has mapped landslides throughout the state 
 To identify and map landslides they use orthoimagery and DEMs generated from high-quality lidar data (max of 2 m/pixel) collected by aerial surveys.
 This represents the current highest resolution approach to mapping landslides.
 ** The Moon
-Researchers have mapped landslides on crater slopes on the Moon [cite:@brunetti_large_2015].
+Similarly to Mercury, landslides have been mapped on crater slopes on the Moon [cite:@brunetti_large_2015].
 Their study only considered landslides over 10^6 m^2.
 To identify and map landslides, they used imagery from the Wide Angle Camera on the Lunar Reconnaissance Orbiter Camera (100 m/pixel), as well as a global DEM (100 m grid size).
 They found 60 landslides in 35 craters.
 ** Mars
-Researchers have undertaken a project to systematically map landslides on Mars [cite:@crosta_introducing_2018].
+Thanks to the availability of high resolution imagery, researchers have undertaken a project to globally map landslides on Mars [cite:@crosta_introducing_2018].
 They analyzed the planet over latitudes from \minus60° to \plus60° and only mapped landslides greater than 10^5 m^2.
 To globally identify landslides they used imagery from the High Resolution Stereo Camera on Mars Express (18 m/pixel), the Mars Orbital Camera (1.5--12 m/pixel), and the Context Imager (5--6 m/pixel) as well as 400 m gridded topography from the Mars Orbital Laser Altimeter (MOLA).
 To locally map landslides they used HiRISE imagery (0.3 m/pixel) and DEMs from HRSC (50--150 m grid size) and MOLA (463 m grid size) when the HRSC-derived DEM was not available.
 Their final catalog contains 3,000+ landslides.
 * Scaling Analyses
 ** Landslide Frequency vs. Area
-A common technique when analyzing landslide catalogs is to examine the relationship between landslide frequency and area [cite:@malamud_landslide_2004].
+A common technique when analyzing landslide catalogs is to examine the relationship between landslide frequency and area [cite:@stark_characterization_2001; @malamud_landslide_2004].
 
 Let $A$ be the landslide area. Then a probability density function $p(A)$ is defined such that that probability of a landslide occurring within a range of areas $A_{\mathrm{min}}$ to $A_{\mathrm{max}}$ is given by
 $$ Pr[A_{\mathrm{min}} \le A \le A_{\mathrm{max}}] = \int_{A_{\mathrm{min}}}^{A_{\mathrm{max}}}p(A)dA. $$
+It is common to plot $p(A)$ as a function of $A$ on a log-log scale.
+These plots have a characteristic shape, as illustrated by figure [[fig:prob_area_schem]].
+TODO: Talk about regions of frequency-area plot, what explanations people have given for them.
+
+#+caption: Typical landslide frequency-area relationship, taken from [cite:@tebbens_landslide_2020].
+#+name: fig:prob_area_schem
+[[file:prob_area_schem.jpeg]]
+
 This probability density function can estimated from the finite samples in a landslide catalog using kernel density estimation.
 I used the implementation in =scikit-learn= with a Gaussian kernel and Scott's method for estimating the bandwidth.
 Due to the wide range of landslide areas, I performed the kernel density estimation in log space.
