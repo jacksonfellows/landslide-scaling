@@ -23,11 +23,19 @@ def load_datasets():
     datasets["Brunetti2015Mercury"] = pd.read_csv("./data/Brunetti2015Table2.csv")
     datasets["Brunetti2015Mercury"]["A_m2"] = datasets["Brunetti2015Mercury"]["Landslide area"]
 
+    datasets["JFVesta"] = geopandas.read_file("data/vesta_slide_area_JF.shp")
+    datasets["JFVesta"]["A_m2"] = datasets["JFVesta"].area
+
     return datasets
 
 datasets = load_datasets()
 
+labels = dict(WASLID="Earth (WA State DNR)", Crosta2018Mars="Mars (Crosta et al. 2018)", Brunetti2015Moon="Moon (Brunetti et al. 2015)", Brunetti2015Mercury="Mercury (Brunetti et al. 2015)", JFVesta="Vesta")
+
 def area_plot():
+    fig, ax = plt.subplots(layout="tight")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     plt.xscale("log")
     plt.yscale("log")
     plt.xlabel("Landslide Area [$m^2$]")
@@ -39,34 +47,7 @@ def area_plot():
         kde = KernelDensity(kernel="gaussian", bandwidth="scott")
         kde.fit(A[:, None])
         probs = np.exp(kde.score_samples(x[:, None]))
-        plt.plot(np.exp(x), probs/np.exp(x), label=f"{key} (n={len(dataset)})")
+        plt.plot(np.exp(x), probs/np.exp(x), label=f"{labels[key]}, n={len(dataset)}")
     plt.legend()
     plt.savefig("prob_area.pdf")
-
-def area_vol_plot():
-    A = gdf["A_m2"]
-    V = gdf["V_m3"]
-
-    I = (A != 0) & np.logical_not(np.isnan(V))
-    log_A = np.log10(A[I])
-    log_V = np.log10(V[I])
-    gamma, log10a = np.polyfit(log_A, log_V, 1)
-    # print(f"{gamma=:0.2f}, {log10a=:0.2f}")
-
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.xlabel("Landslide Area [m^2]")
-    plt.ylabel("Landslide Volume [m^3]")
-    plt.scatter(A, V, facecolors="none", edgecolors="b", alpha=0.1, label="WA Landslide Inventory")
-
-    # Draw power-law fit.
-    A_ = np.array([10**1, 10**8])
-    plt.plot(A_, 10**log10a*A_**gamma, "r--", label=f"Power Law Fit; $V = 10^{{{log10a:0.2f}}}A^{{{gamma:0.2f}}}$")
-
-    # Label some specific landslides.
-    oso_i = np.nonzero(gdf["LS_NAME"].str.contains("Oso") == True)[0][0]
-    plt.annotate("Oso", (A[oso_i], V[oso_i]), xytext=(10,10), textcoords="offset points", arrowprops=dict(color="k", width=1, headwidth=4, headlength=4))
-
-    plt.legend()
-
-    plt.show()
+    plt.close()
